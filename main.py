@@ -30,6 +30,12 @@ def Upgrade():
 	Click(x,y)
 	time.sleep(0.1)
 
+def DelayCheck(Delay):
+	if Delay < 0.01:
+		return 0.01
+	else:
+		return Delay
+
 ##################################################################
 
 DISTANCE = 150
@@ -37,11 +43,11 @@ OFFSET = -100
 MODE = 1
 PAUSE = False
 CYCLE = True
+DELAY = 0.05
 
-print "STEAM CLICKER V.0.3"
+print "STEAM CLICKER V.1.0"
 print "-------------------"
 print "This program will cycle through lanes and click on enemies."
-print "To pause the clicking mode, hit z.  To exit, hit x.  To stop cycle changes, hit c."
 print
 print "Please choose a mode:"
 print "1) No-Upgrade Mode"
@@ -53,13 +59,17 @@ while not EXIT:
 	value = str(value)
 	if value == "1" or value == "2":
 		if value == "1":
-			if raw_input("This will just do standard clicking/cycling. Are you sure? (Y/N) "):
+			if Question(raw_input("This will just do standard clicking/cycling. Are you sure? (Y/N) ")):
 				MODE = 1
 				EXIT = True
+			else:
+				print "Invalid Choice!"
 		if value == "2":
-			if raw_input("This will try to upgrade your damage based on algorithms. Are you sure? (Y/N) "):
+			if Question(raw_input("This will try to upgrade your damage based on algorithms. Are you sure? (Y/N) ")):
 				MODE = 2
 				EXIT = True
+			else:
+				print "Invalid Choice!"
 	else:
 		print "Invalid Choice!"
 
@@ -77,8 +87,11 @@ lane_x = a + 1100
 lane_y = b
 
 print ""
-print "::: TO STOP PROGRAM, HIT X AT ANYTIME! :::"
-print "::: TO PAUSE PROGRAM, HIT Z AT ANYTIME! ::::"
+print "::: TO CHANGE LANES, HIT 1 2 OR 3 AT ANYTIME! :::"
+print "::: TO STOP PROGRAM, HIT X WHILE UNPAUSED! :::"
+print "::: TO PAUSE PROGRAM, HIT PAUSE KEY AT ANYTIME! :::"
+print "::: TO STOP AUTO-CYCLING, HIT C WHILE UNPAUSED! :::"
+print "::: + or - KEYS WILL CHANGE DELAY OF CLICKS :::"
 time.sleep(2)
 
 i = 0
@@ -88,26 +101,6 @@ x,y = lane_x-OFFSET,lane_y
 Click(x,y)
 
 while True:
-	if win32api.GetAsyncKeyState(ord('X')):
-		break
-
-	if win32api.GetAsyncKeyState(ord('Z')):
-		if PAUSE:
-			PAUSE = False
-			print "Unpaused"
-		else:
-			PAUSE = True
-			print "Paused"
-		time.sleep(0.1)
-
-	if win32api.GetAsyncKeyState(ord('C')):
-		if CYCLE:
-			CYCLE = False
-			print "Cycle Change: OFF"
-		else:
-			CYCLE = True
-			print "Cycle Change: ON"
-		time.sleep(0.1)
 
 	if not PAUSE:
 		i += 1
@@ -136,22 +129,51 @@ while True:
 			x,y = enemy_x, enemy_y+DISTANCE+10
 			Click(x,y)
 
-	if win32api.GetAsyncKeyState(ord('1')):
-		k = 1
-		ChangeLane(1)
+		if win32api.GetAsyncKeyState(ord('X')):
+			break
+
+		if win32api.GetAsyncKeyState(ord('C')):
+			if CYCLE:
+				CYCLE = False
+				print "Cycle Change: OFF"
+			else:
+				CYCLE = True
+				print "Cycle Change: ON"
+			time.sleep(0.1)
+
+		if win32api.GetAsyncKeyState(ord('1')):
+			k = 1
+			ChangeLane(1)
+			time.sleep(0.1)
+
+		if win32api.GetAsyncKeyState(ord('2')):
+			k = 2
+			ChangeLane(2)
+			time.sleep(0.1)
+
+		if win32api.GetAsyncKeyState(ord('3')):
+			k = 3
+			ChangeLane(3)
+			time.sleep(0.1)
+
+		if win32api.GetAsyncKeyState(0x6B):
+			DELAY = DelayCheck(DELAY + 0.01)
+			time.sleep(0.1)
+
+		if win32api.GetAsyncKeyState(0x6D):
+			DELAY = DelayCheck(DELAY - 0.01)
+			time.sleep(0.1)
+
+	if win32api.GetAsyncKeyState(0x13):		# Pause Button
+		if PAUSE:
+			PAUSE = False
+			print "Unpaused"
+		else:
+			PAUSE = True
+			print "Paused"
 		time.sleep(0.1)
 
-	if win32api.GetAsyncKeyState(ord('2')):
-		k = 2
-		ChangeLane(2)
-		time.sleep(0.1)
+	time.sleep(DELAY)
 
-	if win32api.GetAsyncKeyState(ord('3')):
-		k = 3
-		ChangeLane(3)
-		time.sleep(0.1)
-
-	time.sleep(0.05)
-
-print "Program successfully ended!  Enjoy your 'hard earned' rewards"
+print "Program successfully ended!  Enjoy your 'hard earned' rewards -shrew"
 time.sleep(4)
